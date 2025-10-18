@@ -1,0 +1,440 @@
+  /* ====== CSS: Blue theme (primary: #1e63ff) ====== */
+  :root {
+      --primary: #1e63ff;
+      --primary-600: #1751d1;
+      --bg: #f6f8ff;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #475569;
+      --ring: rgba(30, 99, 255, 0.35);
+      --danger: #ef4444;
+      --success: #16a34a;
+      --border: #e2e8f0;
+  }
+
+  * {
+      box-sizing: border-box;
+  }
+
+  html,
+  body {
+      height: 100%;
+  }
+
+  body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial;
+      color: var(--text);
+      background: var(--bg);
+  }
+
+  /* Top Nav */
+  header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      backdrop-filter: saturate(180%) blur(10px);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.75));
+      border-bottom: 1px solid var(--border);
+  }
+
+  .nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 20px;
+  }
+
+  .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+  }
+
+  .brand-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--primary);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 800;
+      box-shadow: 0 6px 16px rgba(30, 99, 255, 0.35);
+  }
+
+  .brand h1 {
+      font-size: 18px;
+      margin: 0;
+      color: var(--text);
+  }
+
+  .nav ul {
+      list-style: none;
+      display: flex;
+      gap: 10px;
+      margin: 0 0 0 auto;
+      padding: 0;
+  }
+
+  .nav a {
+      text-decoration: none;
+      color: var(--muted);
+      padding: 8px 12px;
+      border-radius: 10px;
+  }
+
+  .nav a.active,
+  .nav a:hover {
+      color: #0b1220;
+      background: #eaf0ff;
+  }
+
+  /* Layout */
+  main {
+      max-width: 1200px;
+      margin: 22px auto;
+      padding: 0 20px 60px;
+  }
+
+  /* Cards & sections */
+  .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 6px 24px rgba(2, 12, 27, 0.04);
+  }
+
+  .card-head {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+  }
+
+  .card-body {
+      padding: 18px;
+  }
+
+  /* Buttons */
+  .btn {
+      border: none;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-weight: 600;
+      cursor: pointer;
+  }
+
+  .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 8px 16px var(--ring);
+  }
+
+  .btn-primary:hover {
+      background: var(--primary-600);
+  }
+
+  .btn-ghost {
+      background: transparent;
+      color: var(--primary);
+  }
+
+  .btn-outline {
+      background: #fff;
+      border: 1px solid var(--border);
+  }
+
+  .btn-danger {
+      background: var(--danger);
+      color: #fff;
+  }
+
+  /* Inputs */
+  .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+  }
+
+  .field-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="datetime-local"],
+  select,
+  textarea,
+  input[type="file"],
+  input[type="password"] {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 14px;
+      outline: none;
+      box-shadow: 0 0 0 0 var(--ring);
+      transition: box-shadow .2s, border-color .2s;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px var(--ring);
+  }
+
+  label {
+      font-size: 12px;
+      color: var(--muted);
+  }
+
+  /* Tabs */
+  .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+  }
+
+  .tab {
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+  }
+
+  .tab.active {
+      background: #eaf0ff;
+      color: #0b1220;
+      font-weight: 700;
+  }
+
+  /* Events List */
+  .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+  }
+
+  .event-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+  }
+
+  .event {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+  }
+
+  .event h4 {
+      margin: 0;
+  }
+
+  .pill {
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #eef4ff;
+      color: var(--primary-600);
+      display: inline-block;
+  }
+
+  .muted {
+      color: var(--muted);
+      font-size: 14px;
+  }
+
+  /* Calendar */
+  #calendar {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 8px;
+  }
+
+  /* Forum */
+  .thread {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+  }
+
+  .thread-title {
+      font-weight: 800;
+  }
+
+  .attachments {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+  }
+
+  .attachments img,
+  .attachments video {
+      max-width: 180px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+  }
+
+  .reply {
+      border-top: 1px dashed var(--border);
+      padding-top: 8px;
+      margin-top: 8px;
+  }
+
+  /* Modal */
+  .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 12, 27, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 50;
+  }
+
+  .modal {
+      width: 100%;
+      max-width: 520px;
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 60px rgba(2, 12, 27, 0.35);
+      overflow: hidden;
+  }
+
+  .modal-head {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+  }
+
+  .modal-body {
+      padding: 16px;
+  }
+
+  /* Footer */
+  footer {
+      text-align: center;
+      color: var(--muted);
+      padding: 28px 12px;
+  }
+
+  /* Responsive helpers */
+  .hide {
+      display: none !important;
+  }
+
+  /* Tablet (<= 992px) */
+  @media (max-width: 992px) {
+      .nav ul {
+          gap: 6px;
+      }
+
+      .card-head h2 {
+          font-size: 18px;
+      }
+
+      .toolbar {
+          flex-direction: column;
+          align-items: stretch;
+      }
+  }
+
+  /* Mobile (<= 768px) */
+  @media (max-width: 768px) {
+      .nav {
+          flex-wrap: wrap;
+          gap: 10px;
+      }
+
+      .nav ul {
+          flex: 1;
+          justify-content: space-around;
+          flex-wrap: wrap;
+      }
+
+      .field-row {
+          flex-direction: column;
+      }
+
+      .card {
+          border-radius: 12px;
+      }
+
+      .event-list {
+          grid-template-columns: 1fr;
+          /* stack events */
+      }
+
+      .modal {
+          max-width: 95%;
+      }
+  }
+
+  /* Small Mobile (<= 480px) */
+  @media (max-width: 480px) {
+      body {
+          font-size: 14px;
+          padding: 5px;
+      }
+
+      .brand h1 {
+          font-size: 16px;
+      }
+
+      .btn {
+          padding: 8px 10px;
+          font-size: 14px;
+      }
+
+      label {
+          font-size: 11px;
+      }
+  }
+
+  .qa-thread {
+      border: 2px solid #ef4444;
+      /* Tailwind red-500 */
+      background: #fff5f5;
+      /* light red background for contrast */
+  }
+
+  .attachments a.doc-link {
+      display: inline-block;
+      padding: 6px 10px;
+      background: #f9fafb;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #1e63ff;
+      font-size: 14px;
+      margin: 4px 0;
+  }
+
+  .attachments a.doc-link:hover {
+      background: #eef4ff;
+  }

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Thrust Academy | Event Planner</title>
+  <!-- FullCalendar -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+</head>
+<link rel="stylesheet" href="Thrust.css">
+
+<body>
+  <!-- ====== NAV ====== -->
+  <header>
+    <nav class="nav">
+      <a class="brand" href="#" data-route="home">
+        <div class="brand-badge">TA</div>
+        <h1>Thrust Academy</h1>
+      </a>
+      <ul>
+        <li><a href="#events" class="route-link active" data-route="events">Events</a></li>
+        <li><a href="#calendar" class="route-link" data-route="calendar">Calendar</a></li>
+        <li><a href="#discussions" class="route-link" data-route="discussions">Discussions</a></li>
+        <li><a href="#profile" class="route-link" data-route="profile">My Profile</a></li>
+        <li><a href="#admin" class="route-link" data-route="admin">Admin</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ====== EVENTS (List View) ====== -->
+    <section id="view-events" class="card">
+      <div class="card-head">
+        <h2 style="margin:0">Upcoming Lectures</h2>
+        <div class="tabs" style="margin-left:auto">
+          <button class="tab active" id="tab-list">List View</button>
+          <button class="tab" id="tab-calendar">Calendar View</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="toolbar">
+          <div class="field" style="min-width:220px; flex:1">
+            <label>Search</label>
+            <input id="searchInput" type="text" placeholder="Search subject, venue, tutor..." />
+          </div>
+          <div class="field" style="min-width:160px">
+            <label>Filter by Subject</label>
+            <select id="filterSubject">
+              <option value="">All</option>
+              <option>Mathematics</option>
+              <option>Physics</option>
+              <option>Chemistry</option>
+              <option>Computer Science</option>
+            </select>
+          </div>
+          <div class="field" style="min-width:160px">
+            <label>Date From</label>
+            <input id="dateFrom" type="date" />
+          </div>
+          <div class="field" style="min-width:160px">
+            <label>Date To</label>
+            <input id="dateTo" type="date" />
+          </div>
+          <button class="btn btn-outline" id="clearFilters" title="Clear filters">Reset</button>
+        </div>
+        <div id="eventsContainer" class="event-list"></div>
+      </div>
+    </section>
+
+    <!-- ====== CALENDAR (Calendar View) ====== -->
+    <section id="view-calendar" class="card hide">
+      <div class="card-head">
+        <h2 style="margin:0">Lecture Calendar</h2>
+        <div class="tabs" style="margin-left:auto">
+          <button class="tab" id="tab-list-2">List View</button>
+          <button class="tab active" id="tab-calendar-2">Calendar View</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div id="calendar"></div>
+      </div>
+    </section>
+
+    <!-- ====== DISCUSSIONS ====== -->
+    <section id="view-discussions" class="card hide">
+      <div class="card-head">
+        <h2 style="margin:0">Discussion Forum</h2>
+      </div>
+      <div class="card-body">
+        <div class="card" style="margin-bottom:12px;">
+          <div class="card-body">
+            <form id="newThreadForm">
+              <div class="field-row">
+                <div class="field" style="flex:2">
+                  <label>Title</label>
+                  <input type="text" id="threadTitle" placeholder="e.g., Tips for the Mechanics test" required />
+                </div>
+                <div class="field" style="flex:1">
+                  <label>Your Name</label>
+                  <input type="text" id="threadAuthor" placeholder="Display name" required />
+                </div>
+              </div>
+              <div class="field" style="margin-top:8px">
+                <label>Message</label>
+                <textarea id="threadBody" rows="3" placeholder="Start the discussion..." required></textarea>
+              </div>
+              <div class="field" style="margin-top:8px">
+                <label>Attachments (images/videos)</label>
+                <input type="file" id="threadFiles" accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
+                  multiple />
+              </div>
+              <div style="display:flex; gap:10px; align-items:center; margin-top:10px;">
+                <button class="btn btn-primary" type="submit">Post Thread</button>
+                <label style="display:flex; align-items:center; gap:6px;">
+                  <input type="checkbox" id="moderationFlag" /> Mark as Q&A
+                </label>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div id="threadsContainer" style="display:grid; gap:12px"></div>
+      </div>
+    </section>
+
+    <!-- ====== PROFILE ====== -->
+    <section id="view-profile" class="card hide">
+      <div class="card-head">
+        <h2 style="margin:0">My Profile</h2>
+      </div>
+      <div class="card-body">
+        <div class="field-row">
+          <div class="field" style="flex:1">
+            <label>Your Name</label>
+            <input type="text" id="profileName" placeholder="Enter your name" />
+          </div>
+          <div class="field" style="flex:1">
+            <label>Email</label>
+            <input type="email" id="profileEmail" placeholder="you@example.com" />
+          </div>
+        </div>
+        <div style="margin-top:10px; display:flex; gap:10px;">
+          <button class="btn btn-primary" id="saveProfile">Save Profile</button>
+          <span class="muted" id="profileSavedMsg"></span>
+        </div>
+        <hr style="margin:20px 0; border:none; border-top:1px solid var(--border)" />
+        <h3>My RSVPs</h3>
+        <div id="myRsvps" class="event-list"></div>
+      </div>
+    </section>
+
+    <!-- ====== ADMIN ====== -->
+    <section id="view-admin" class="card hide">
+      <div class="card-head">
+        <h2 style="margin:0">Admin Panel</h2>
+      </div>
+      <div class="card-body">
+        <div class="card" style="margin-bottom:12px;">
+          <div class="card-body">
+            <div class="field-row">
+              <div class="field" style="flex:1; position: reletive">
+                <label>Admin Password</label>
+                <input type="password" id="adminPassword" placeholder="Enter admin password" />
+                <button type="button" id="togglePassword"
+                  style="position:absolute; right:10px; top:30px; background:none; border:none; cursor:pointer; color:#1f6edd;">
+                  👁
+                </button>
+              </div>
+              <div class="field" style="flex:0 0 200px; align-self:flex-end;">
+                <button class="btn btn-primary" id="toggleAdminMode">Toggle Admin Mode</button>
+              </div>
+              <span id="adminModeStatus" class="pill" style="align-self:flex-end;">Admin: OFF</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><strong>Add / Edit Event</strong></div>
+          <div class="card-body">
+            <form id="eventForm">
+              <input type="hidden" id="eventId" />
+              <div class="field-row">
+                <div class="field" style="flex:2">
+                  <label>Subject</label>
+                  <input id="evSubject" type="text" placeholder="e.g., Mathematics – Calculus I" required />
+                </div>
+                <div class="field" style="flex:1">
+                  <label>Tutor</label>
+                  <input id="evTutor" type="text" placeholder="Dr. Ndlovu" required />
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field" style="flex:1">
+                  <label>Venue</label>
+                  <input id="evVenue" type="text" placeholder="Room A1 / Online" required />
+                </div>
+                <div class="field" style="flex:1">
+                  <label>Start</label>
+                  <input id="evStart" type="datetime-local" required />
+                </div>
+                <div class="field" style="flex:1">
+                  <label>End</label>
+                  <input id="evEnd" type="datetime-local" required />
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field" style="flex:1">
+                  <label>Price (ZAR)</label>
+                  <input id="evPrice" type="text" placeholder="e.g., 80" />
+                </div>
+                <div class="field" style="flex:2">
+                  <label>Description</label>
+                  <input id="evDesc" type="text" placeholder="Short summary" />
+                </div>
+              </div>
+              <div style="display:flex; gap:10px; margin-top:10px;">
+                <button class="btn btn-primary" type="submit">Save Event</button>
+                <button class="btn btn-outline" type="button" id="cancelEdit">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="card">
+          <div class="card-head"><strong>Manage Events</strong></div>
+          <div class="card-body">
+            <div id="adminEvents" class="event-list"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    © 2025 Thrust Academy • Built for learning • Demo front‑end (localStorage)
+  </footer>
+
+  <!-- ====== RSVP MODAL ====== -->
+  <div id="rsvpBackdrop" class="modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal">
+      <div class="modal-head">
+        <strong id="rsvpTitle">RSVP</strong>
+        <button class="btn btn-ghost" id="closeRsvp">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="rsvpForm">
+          <input type="hidden" id="rsvpEventId" />
+          <div class="field-row" id="rsvpIdentityFields">
+            <div class="field" style="flex:1">
+              <label>Your Name</label>
+              <input type="text" id="rsvpName" required />
+            </div>
+            <div class="field" style="flex:1">
+              <label>Email</label>
+              <input type="email" id="rsvpEmail" required />
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field" style="flex:1">
+              <label>Payment Method</label>
+              <select id="rsvpPayment">
+                <option value="cash">Cash on Arrival</option>
+                <option value="card">Credit/Debit Card</option>
+                <option value="eft">Instant EFT</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Hidden card payment box here -->
+          <div id="cardPaymentBox" style="display:none; margin-top:10px;">
+            <label>Card Number:</label>
+            <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19"><br>
+
+            <label>Expiry Date:</label>
+            <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5"><br>
+
+            <label>CVV:</label>
+            <input type="password" id="cardCVV" placeholder="123" maxlength="4"><br>
+          </div>
+
+          <div class="field" style="flex:1">
+            <label>Seats</label>
+            <input type="text" id="rsvpSeats" placeholder="1" />
+          </div>
+      </div>
+      <div class="muted" id="rsvpDesc"></div>
+      <div style="display:flex; gap:10px; align-items:center; margin-top:12px;">
+        <button class="btn btn-primary" type="submit">Confirm RSVP</button>
+        <span id="rsvpMsg" class="muted"></span>
+      </div>
+      </form>
+    </div>
+  </div>
+  <script src="Thrust.js"></script>
+  </div>
+
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</body>
+
+</html>

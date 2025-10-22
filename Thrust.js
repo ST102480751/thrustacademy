@@ -293,59 +293,106 @@ $('#saveProfile').addEventListener('click', () => {
 function isAdminMode() {
     return load(LS_KEYS.ADMIN, { on: false }).on;
 }
+
 function setAdminMode(on) {
     save(LS_KEYS.ADMIN, { on });
-    $('#adminModeStatus').textContent = `Admin: ${on ? 'ON' : 'OFF'}`;
-    renderAdminEvents();
+    const statusEl = $('#adminModeStatus');
+    statusEl.textContent = `Admin: ${on ? 'ON' : 'OFF'}`;
+    statusEl.style.backgroundColor = on ? '#4CAF50' : '#ccc'; // green = ON, grey = OFF
+    renderAdminEvents(); // refresh the event list visibility
     renderThreads();
 }
 
+// ---- Show/Hide Password ----
 $('#togglePassword').addEventListener('click', () => {
     const input = $('#adminPassword');
     if (input.type === "password") {
         input.type = "text";
-        $('#togglePassword').textContent = "🙈"; // change icon
+        $('#togglePassword').textContent = "🙈";
     } else {
         input.type = "password";
-        $('#togglePassword').textContent = "👁"; // change back
+        $('#togglePassword').textContent = "👁";
     }
 });
 
-
+// ---- Toggle Admin Mode ----
 $('#toggleAdminMode').addEventListener('click', () => {
     const pass = $('#adminPassword').value.trim();
+    const currentMode = isAdminMode();
 
-    if (pass === "Admin75") {
-        setAdminMode(true);
-        alert("Admin mode activated ✅");
+    if (!currentMode) {
+        // Admin is OFF → Try to turn ON
+        if (pass === "Admin75") {
+            setAdminMode(true);
+            alert("✅ Admin mode activated");
+        } else {
+            alert("❌ Invalid Admin code, please try again");
+        }
     } else {
+        // Admin is ON → Turn OFF
         setAdminMode(false);
-        alert("Invalid Admin code, please try again ❌");
+        alert("🔒 Admin mode deactivated");
     }
 });
 
+// ---- Render Admin Events ----
 function renderAdminEvents() {
-    const cont = $('#adminEvents'); cont.innerHTML = '';
+    const cont = $('#adminEvents');
+    cont.innerHTML = '';
+
     const events = load(LS_KEYS.EVENTS, []);
+    const rsvps = load(LS_KEYS.RSVPS, []);
+    const adminActive = isAdminMode(); // control visibility
+
+    if (!events.length) {
+        cont.innerHTML = '<div class="muted">No events available.</div>';
+        return;
+    }
+
     events.sort((a, b) => new Date(a.start) - new Date(b.start)).forEach(ev => {
-        const div = document.createElement('div'); div.className = 'event';
+        // Count RSVPs
+        const eventRsvps = rsvps.filter(r => r.eventId === ev.id);
+        const rsvpCount = eventRsvps.length;
+
+        const div = document.createElement('div');
+        div.className = 'event';
         div.innerHTML = `
-          <h4>${ev.subject}</h4>
-          <div class="muted">${ev.venue} • ${fmtDate(ev.start)} – ${fmtDate(ev.end)}</div>
-          <div class="muted">Tutor: ${ev.tutor} • ${ev.price ? 'R' + ev.price : 'Free'}</div>
-          <div style="display:flex; gap:8px; margin-top:6px;">
-            <button class="btn btn-outline" data-action="edit" data-id="${ev.id}">Edit</button>
-            <button class="btn btn-danger" data-action="delete" data-id="${ev.id}" ${isAdminMode() ? '' : 'disabled'}>Delete</button>
-          </div>
-        `;
+      <h4>${ev.subject}</h4>
+      <div class="muted">${ev.venue} • ${fmtDate(ev.start)} – ${fmtDate(ev.end)}</div>
+      <div class="muted">Tutor: ${ev.tutor} • ${ev.price ? 'R' + ev.price : 'Free'}</div>
+
+      ${adminActive
+                ? `
+          <div><strong>Total RSVPs:</strong> ${rsvpCount}</div>
+          ${rsvpCount > 0 ? `
+            <details style="margin-top:5px;">
+              <summary>View Attendees (${rsvpCount})</summary>
+              <ul style="margin:8px 0 0 15px; padding:0;">
+                ${eventRsvps.map(r => `<li>${r.name} (${r.email}) - ${r.seats || 1} seat(s)</li>`).join('')}
+              </ul>
+            </details>
+          ` : '<div class="muted">No RSVPs yet.</div>'}
+        `
+                : ''
+            }
+
+      <div style="display:flex; gap:8px; margin-top:6px;">
+        <button class="btn btn-outline" data-action="edit" data-id="${ev.id}">Edit</button>
+        <button class="btn btn-danger" data-action="delete" data-id="${ev.id}" ${adminActive ? '' : 'disabled'}>Delete</button>
+      </div>
+    `;
         cont.appendChild(div);
     });
 
+    // ---- Event Button Actions ----
     cont.onclick = (e) => {
-        const btn = e.target.closest('button'); if (!btn) return;
-        const id = btn.dataset.id; const action = btn.dataset.action;
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        const id = btn.dataset.id;
+        const action = btn.dataset.action;
         const events = load(LS_KEYS.EVENTS, []);
         const current = events.find(x => x.id === id);
+
         if (action === 'edit') {
             if (!current) return;
             $('#eventId').value = current.id;
@@ -359,19 +406,30 @@ function renderAdminEvents() {
             location.hash = 'admin';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
         if (action === 'delete') {
-            if (!isAdminMode()) { alert('Admin mode is OFF. Enter password and toggle ON.'); return; }
+            if (!isAdminMode()) {
+                alert('Admin mode is OFF. Enter password and toggle ON.');
+                return;
+            }
             if (!confirm('Delete this event?')) return;
             const remaining = events.filter(x => x.id !== id);
             save(LS_KEYS.EVENTS, remaining);
-            renderAdminEvents(); renderEvents(); renderCalendar();
+            renderAdminEvents();
+            renderEvents();
+            renderCalendar();
         }
     };
 }
 
+// ---- Save Event ----
 $('#eventForm').addEventListener('submit', (e) => {
     e.preventDefault();
-    if (!isAdminMode()) { alert('Admin mode is OFF. Enter password and toggle ON.'); return; }
+    if (!isAdminMode()) {
+        alert('Admin mode is OFF. Enter password and toggle ON.');
+        return;
+    }
+
     const data = {
         id: $('#eventId').value || uid(),
         subject: $('#evSubject').value.trim(),
@@ -382,112 +440,27 @@ $('#eventForm').addEventListener('submit', (e) => {
         price: parseFloat($('#evPrice').value) || 0,
         desc: $('#evDesc').value.trim(),
     };
-    if (!data.subject || !data.tutor || !data.venue || !data.start || !data.end) { alert('Please fill all required fields.'); return; }
+
+    if (!data.subject || !data.tutor || !data.venue || !data.start || !data.end) {
+        alert('Please fill all required fields.');
+        return;
+    }
+
     const events = load(LS_KEYS.EVENTS, []);
     const idx = events.findIndex(x => x.id === data.id);
     if (idx >= 0) events[idx] = data; else events.push(data);
     save(LS_KEYS.EVENTS, events);
-    // Reset form
-    $('#eventForm').reset(); $('#eventId').value = '';
-    renderAdminEvents(); renderEvents(); renderCalendar();
+
+    $('#eventForm').reset();
+    $('#eventId').value = '';
+    renderAdminEvents();
+    renderEvents();
+    renderCalendar();
     alert('Event saved');
 });
-$('#cancelEdit').addEventListener('click', () => { $('#eventForm').reset(); $('#eventId').value = ''; });
 
-// ---- Discussions (Threads + Replies + Media) ----
-async function filesToDataUrls(files) {
-    const tasks = Array.from(files).map(file => new Promise(resolve => {
-        const reader = new FileReader(); reader.onload = () => resolve({ name: file.name, type: file.type, data: reader.result }); reader.readAsDataURL(file);
-    }));
-    return Promise.all(tasks);
-}
-$('#newThreadForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const title = $('#threadTitle').value.trim();
-    const author = $('#threadAuthor').value.trim();
-    const body = $('#threadBody').value.trim();
-    const isQA = $('#moderationFlag').checked;
-    if (!title || !author || !body) return;
-    const attachments = await filesToDataUrls($('#threadFiles').files);
-    const threads = load(LS_KEYS.THREADS, []);
-    threads.unshift({ id: uid(), title, author, body, isQA, ts: new Date().toISOString(), attachments, replies: [] });
-    save(LS_KEYS.THREADS, threads);
-    $('#newThreadForm').reset();
-    renderThreads();
+$('#cancelEdit').addEventListener('click', () => {
+    $('#eventForm').reset();
+    $('#eventId').value = '';
 });
 
-function renderThreads() {
-    const container = $('#threadsContainer'); container.innerHTML = '';
-    const threads = load(LS_KEYS.THREADS, []);
-    if (!threads.length) { container.innerHTML = '<div class="muted">No threads yet. Start the conversation!</div>'; return; }
-
-    threads.forEach(t => {
-        const el = document.createElement('div');
-        el.className = 'thread' + (t.isQA ? ' qa-thread' : '');
-        el.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
-            <div class="thread-title">${t.title}</div>
-            <div class="muted">by ${t.author} • ${new Date(t.ts).toLocaleString()} ${t.isQA ? '• Q&A' : ''}</div>
-          </div>
-          <div>${t.body}</div>
-          <div class="attachments">${(t.attachments || []).map(att => {
-            if (att.type.startsWith('image/')) {
-                return `<img alt="${att.name}" src="${att.data}" />`;
-            } else if (att.type.startsWith('video/')) {
-                return `<video src="${att.data}" controls></video>`;
-            } else {
-                // For documents (pdf, word, etc.)
-                return `<a href="${att.data}" download="${att.name}" class="doc-link">📄 ${att.name}</a>`;
-            }
-        }).join('')
-            }</div>
-          <div id="replies-${t.id}">
-            ${(t.replies || []).map(r => `
-              <div class="reply">
-                <strong>${r.author}</strong> <span class="muted">• ${new Date(r.ts).toLocaleString()}</span>
-                <div>${r.body}</div>
-              </div>
-            `).join('')}
-          </div>
-          <form data-reply-form="${t.id}" style="display:flex; gap:8px; margin-top:6px;">
-            <input type="text" placeholder="Your name" required style="flex:0 0 160px;" />
-            <input type="text" placeholder="Write a reply..." required style="flex:1;" />
-            <button class="btn btn-outline" type="submit">Reply</button>
-            <button class="btn btn-danger" type="button" data-delete-thread="${t.id}" ${isAdminMode() ? '' : 'disabled'}>Delete</button>
-          </form>
-        `;
-        container.appendChild(el);
-    });
-
-
-    // Reply handlers (delegation)
-    container.addEventListener('submit', (e) => {
-        const form = e.target.closest('form[data-reply-form]');
-        if (!form) return;
-        e.preventDefault();
-        const threadId = form.getAttribute('data-reply-form');
-        const [nameInput, bodyInput] = form.querySelectorAll('input');
-        const name = nameInput.value.trim();
-        const body = bodyInput.value.trim();
-        if (!name || !body) return;
-        const threads = load(LS_KEYS.THREADS, []);
-        const t = threads.find(x => x.id === threadId); if (!t) return;
-        t.replies.push({ author: name, body, ts: new Date().toISOString() });
-        save(LS_KEYS.THREADS, threads);
-        renderThreads();
-    });
-
-    // Delete thread (admin)
-    container.addEventListener('click', (e) => {
-        const btn = e.target.closest('[data-delete-thread]'); if (!btn) return;
-        if (!isAdminMode()) { alert('Admin mode is OFF. Enter password and toggle ON.'); return; }
-        if (!confirm('Delete this thread?')) return;
-        const id = btn.getAttribute('data-delete-thread');
-        const threads = load(LS_KEYS.THREADS, []);
-        save(LS_KEYS.THREADS, threads.filter(t => t.id !== id));
-        renderThreads();
-    });
-}
-
-// Initial renders
-renderEvents();
